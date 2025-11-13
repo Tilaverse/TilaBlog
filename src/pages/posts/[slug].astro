@@ -4,6 +4,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
+// ✅ Declare postsDir first, so getStaticPaths can access it
 const postsDir = path.join(Astro.cwd, 'src', 'content', 'posts');
 
 // 1️⃣ Provide getStaticPaths for static builds
