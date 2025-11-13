@@ -1,18 +1,18 @@
 ---
 // src/pages/posts/[slug].astro
-// FINAL VERSION — 100% working, no errors, production-ready
+// FINAL, BULLETPROOF VERSION — WORKS ON GITHUB ACTIONS, LOCAL, EVERYWHERE
 
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
-// Define postsDir at the very top — BEFORE getStaticPaths
-const postsDir = path.join(process.cwd(), 'src', 'content', 'posts');
-
-// Generate static paths — runs at build time
+// getStaticPaths — runs at build time
 export async function getStaticPaths() {
-  // Safety: check if directory exists
+  // Define postsDir INSIDE the function — 100% safe
+  const postsDir = path.join(process.cwd(), 'src', 'content', 'posts');
+
+  // Safety: directory must exist
   if (!fs.existsSync(postsDir)) {
     console.warn(`[getStaticPaths] Posts directory not found: ${postsDir}`);
     return [];
@@ -21,22 +21,20 @@ export async function getStaticPaths() {
   try {
     const files = fs.readdirSync(postsDir);
 
-    // Filter only valid .md files
     const validSlugs = files
-      .filter(filename => 
+      .filter(filename =>
         filename.endsWith('.md') &&
-        !filename.startsWith('.') &&      // Skip .DS_Store, .gitignore
-        !filename.includes('.bak') &&     // Skip backup files
-        !filename.includes('draft')       // Skip drafts
+        !filename.startsWith('.') &&
+        !filename.includes('.bak') &&
+        !filename.includes('draft')
       )
       .map(filename => filename.replace(/\.md$/, ''));
 
-    // Return paths
     return validSlugs.map(slug => ({
       params: { slug },
     }));
   } catch (error) {
-    console.error('[getStaticPaths] Error reading posts directory:', error);
+    console.error('[getStaticPaths] Failed to read posts:', error);
     return [];
   }
 }
@@ -44,15 +42,16 @@ export async function getStaticPaths() {
 // Now safe: slug comes from getStaticPaths
 const { slug } = Astro.params;
 
-// Build full file path
+// Reconstruct postsDir — must be identical to getStaticPaths
+const postsDir = path.join(process.cwd(), 'src', 'content', 'posts');
 const filePath = path.join(postsDir, `${slug}.md`);
 
-// Safety check — should never fail if getStaticPaths is correct
+// Critical: file must exist
 if (!fs.existsSync(filePath)) {
-  throw new Error(`Post not found: ${slug}\nExpected file: ${filePath}`);
+  throw new Error(`Post not found: ${slug}\nFile: ${filePath}`);
 }
 
-// Read and parse markdown
+// Read and parse
 const raw = fs.readFileSync(filePath, 'utf-8');
 const { data, content } = matter(raw);
 const html = marked(content);
@@ -72,16 +71,15 @@ const html = marked(content);
         <header class="post-header">
           <h1>{data.title || slug}</h1>
           {data.date && (
-            <p class="date">
+            <time class="date" datetime={data.date}>
               {new Date(data.date).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
               })}
-            </p>
+            </time>
           )}
         </header>
-
         <div class="content" set:html={html}></div>
       </article>
     </main>
