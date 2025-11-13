@@ -4,11 +4,9 @@ import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
-// ✅ Declare all variables BEFORE getStaticPaths
-const postsDir = path.join(Astro.cwd, 'src', 'content', 'posts');
-
 // 1️⃣ Static paths for all posts
 export async function getStaticPaths() {
+  const postsDir = path.join(process.cwd(), 'src', 'content', 'posts'); // ✅ use process.cwd() here
   const files = fs.readdirSync(postsDir);
   const paths = files
     .filter(f => f.endsWith('.md'))
@@ -20,6 +18,7 @@ export async function getStaticPaths() {
 
 // 2️⃣ Get slug and read the file
 const slug = Astro.params.slug;
+const postsDir = path.join(Astro.cwd, 'src', 'content', 'posts'); // safe here for runtime
 
 function findPostFileBySlug(slug) {
   const files = fs.readdirSync(postsDir);
