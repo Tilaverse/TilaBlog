@@ -1,12 +1,24 @@
 ---
-// src/pages/posts/[slug].astro
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
-const slug = Astro.params.slug;
 const postsDir = path.join(Astro.cwd, 'src', 'content', 'posts');
+
+// 1️⃣ Provide getStaticPaths for static builds
+export async function getStaticPaths() {
+  const files = fs.readdirSync(postsDir);
+  const paths = files
+    .filter(f => f.endsWith('.md'))
+    .map(f => ({
+      params: { slug: f.replace('.md', '') },
+    }));
+  return paths;
+}
+
+// 2️⃣ Get the slug and read the file
+const slug = Astro.params.slug;
 
 function findPostFileBySlug(slug) {
   const files = fs.readdirSync(postsDir);
