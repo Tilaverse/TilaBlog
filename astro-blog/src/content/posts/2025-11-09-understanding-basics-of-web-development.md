@@ -7,4 +7,4 @@ excerpt: "Web development is the work involved in building and maintaining websi
 
 Full article contents go here in markdown.
 
-Lorem ipsum...
+
