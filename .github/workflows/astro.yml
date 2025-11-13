@@ -3,7 +3,7 @@ name: Deploy Astro to GitHub Pages
 on:
   push:
     branches:
-      - main  # or master
+      - main
 
 jobs:
   build-deploy:
@@ -23,7 +23,6 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: ./TilaBlog
         run: |
           if [ -f "yarn.lock" ]; then
             yarn install --frozen-lockfile
@@ -37,7 +36,6 @@ jobs:
           fi
 
       - name: Build project
-        working-directory: ./TilaBlog
         run: |
           npm run build || yarn build || pnpm build
 
@@ -45,4 +43,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./TilaBlog/dist
+          publish_dir: ./dist
