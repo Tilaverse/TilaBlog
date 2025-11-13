@@ -1,0 +1,39 @@
+---
+// src/pages/posts/[slug].astro
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
+import { marked } from 'marked';
+
+const slug = Astro.params.slug;
+const postsDir = path.join(Astro.cwd, 'src', 'content', 'posts');
+
+function findPostFileBySlug(slug) {
+  const files = fs.readdirSync(postsDir);
+  const file = files.find(f => f.includes(slug) || f.replace('.md', '') === slug);
+  return file ? path.join(postsDir, file) : null;
+}
+
+const file = findPostFileBySlug(slug);
+if (!file) {
+  throw new Error(`Post not found: ${slug}`);
+}
+
+const raw = fs.readFileSync(file, 'utf8');
+const { data, content } = matter(raw);
+const html = marked(content);
+---
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>{data.title}</title>
+    <link rel="stylesheet" href="/styles/globals.css" />
+  </head>
+  <body>
+    <article class="post-full">
+      <h1>{data.title}</h1>
+      <p class="date">{new Date(data.date).toLocaleDateString()}</p>
+      <div class="content" set:html={html}></div>
+    </article>
+  </body>
+</html>
