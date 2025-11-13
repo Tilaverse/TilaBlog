@@ -15,20 +15,39 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm install marked
-        # ↑ This now works because package-lock.json exists
+      - name: Install ALL Dependencies
+        run: npm install
+        # Installs astro, gray-matter, marked, slugify, etc.
 
-      - name: Build
+      - name: Generate package-lock.json (if missing)
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "package-lock.json not found. Generating..."
+            npm install --package-lock-only
+          fi
+
+      - name: Commit package-lock.json (first-time fix)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions@github.com"
+          if [ ! -f package-lock.json ]; then
+            echo "Still missing. Forcing generation..."
+            npm install --package-lock-only
+          fi
+          git add package-lock.json
+          git commit -m "chore: add package-lock.json (auto-generated)" || echo "Nothing to commit"
+          git push origin main || echo "No changes to push"
+
+      - name: Build Site
         run: npm run build
 
       - name: Deploy to GitHub Pages
