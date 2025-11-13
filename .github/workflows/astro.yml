@@ -1,3 +1,4 @@
+# .github/workflows/deploy.yml
 name: Deploy Astro Blog
 
 on:
@@ -23,13 +24,14 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install
+      - name: Install Dependencies
         run: npm ci
+        # ↑ This now works because package-lock.json exists
 
       - name: Build
         run: npm run build
 
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
