@@ -12,6 +12,10 @@ permissions:
   id-token: write        # For actions requiring OIDC
   actions: read         # Optional, for general actions
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
