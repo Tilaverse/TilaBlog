@@ -33,7 +33,7 @@ jobs:
         run: node ./scripts/generate-lists.js
         
       - name: Build Astro
-        run: npm run build-only
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
