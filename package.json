@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "node ./scripts/generate-lists.js",
-    "build-only": "astro build",
+    "prebuild": "node ./scripts/generate-lists.js",
+    "build": "astro build",
     "preview": "astro preview",
     "format": "prettier --write ."
   },
