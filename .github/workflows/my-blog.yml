@@ -15,22 +15,26 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15   # Prevents GitHub from auto-canceling if it runs too long
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # Prevents requiring manual approval
+          persist-credentials: false  # Avoid manual approval prompts
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'               # Speeds up repeated installs
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci                 # Cleaner and faster than npm install
 
       - name: Build
-        run: npm run build
+        run: |
+          echo "Building Astro blog..."
+          npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
@@ -38,3 +42,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           force_orphan: true
+          keep_files: true            # Avoid deleting existing files if partial deploy occurs
