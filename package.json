@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build-only": "astro build",
-    "build": "node ./scripts/generate-lists.js && astro build",
+    "build": "node ./scripts/generate-lists.js",
     "preview": "astro preview",
     "format": "prettier --write ."
   },
